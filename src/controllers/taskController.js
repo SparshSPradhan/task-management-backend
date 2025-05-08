@@ -600,7 +600,7 @@ exports.updateTask = async (req, res) => {
     }
 
     res.json(task);
-  } taskController.js catch (error) {
+  }  catch (error) {
     console.error('Update task error:', error);
     if (error.name === 'ValidationError') {
       return res.status(400).json({ message: 'Task validation failed', errors: error.errors });
