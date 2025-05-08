@@ -152,7 +152,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'https://task-management-frontend-sparsh-3513hg2ye.vercel.app',
+    origin: 'https://task-management-frontend-sparsh-f9l2kw6jp.vercel.app',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
   },
@@ -162,7 +162,7 @@ const io = new Server(server, {
 });
 
 app.use(cors({
-  origin: 'https://task-management-frontend-sparsh-3513hg2ye.vercel.app',
+  origin: 'https://task-management-frontend-sparsh-f9l2kw6jp.vercel.app',
   credentials: true
 }));
 app.use(express.json());
