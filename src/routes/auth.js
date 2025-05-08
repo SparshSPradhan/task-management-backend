@@ -1,17 +1,3 @@
-// const express = require('express');
-// const router = express.Router();
-// const { register, login, getUsers, getMe } = require('../controllers/authController');
-// const auth = require('../middleware/auth');
-
-// router.post('/register', register);
-// router.post('/login', login);
-// router.get('/users', auth, getUsers);
-// router.get('/me', auth, getMe);
-
-// module.exports = router;
-
-
-
 
 
 const express = require('express');
@@ -24,6 +10,11 @@ const router = express.Router();
 // Login route
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
+
+  // Validate request body
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password are required' });
+  }
 
   try {
     // Check if user exists
@@ -43,30 +34,31 @@ router.post('/login', async (req, res) => {
       expiresIn: '1h',
     });
 
-    res.json({ token, user: { id: user._id, email: user.email } });
+    res.json({ token, user: { id: user._id, username: user.username, email: user.email } });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// Register route (for completeness)
+// Register route
 router.post('/register', async (req, res) => {
-  const { email, password } = req.body;
+  const { username, email, password } = req.body;
+
+  // Validate request body
+  if (!username || !email || !password) {
+    return res.status(400).json({ message: 'Username, email, and password are required' });
+  }
 
   try {
     // Check if user exists
-    let user = await User.findOne({ email });
+    let user = await User.findOne({ $or: [{ email }, { username }] });
     if (user) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ message: 'User with this email or username already exists' });
     }
 
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Create user
-    user = new User({ email, password: hashedPassword });
+    // Create user (password hashing handled by User model pre-save hook)
+    user = new User({ username, email, password });
     await user.save();
 
     // Generate JWT
@@ -74,14 +66,14 @@ router.post('/register', async (req, res) => {
       expiresIn: '1h',
     });
 
-    res.json({ token, user: { id: user._id, email: user.email } });
+    res.json({ token, user: { id: user._id, username: user.username, email: user.email } });
   } catch (error) {
     console.error('Register error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// Get all users (for testing)
+// Get all users
 router.get('/users', async (req, res) => {
   try {
     const users = await User.find().select('-password');
